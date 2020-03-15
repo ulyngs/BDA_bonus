@@ -1,0 +1,76 @@
+---
+title: "Reading large data"
+author: "Ulrik Lyngs"
+date: "Last updated: 15 March 2020"
+output: html_document
+---
+
+```{r}
+#install.packages("tidyverse") 
+library(tidyverse)
+
+#install.packages("vroom")
+library(vroom)
+```
+
+# Tips for working with very large datasets
+In the present version of this document, I will focus on rectangular (i.e. with rows and columns) data, such a a CSV file. 
+(JSON files are another can of worms that I may add some notes for in the future)
+
+## Who cares?
+You might find yourself working with a very large dataset (e.g., 5 gigs of tweets), possibly too big for your computer to fit in RAM.
+
+Basically, you have two strategies: 
+1. In-memory: think more cleverly about your problem, and find a way to fit the data you need to analyse into memory anyway 
+  (e.g., do you actually only need to read in parts of your data? Can you actually fit it into memory, but are just annoyed that it takes a long time to read in?)
+
+2. Out-of-memory: do your data analysis using some sort of distributed cloud service and/or data base system
+
+For the purposes of this class, it's almost certainly not worth your time looking into out-of-memory strategies, but if you're planning to go into data science, you may have to learn about this eventually.
+
+## In-memory strategies
+### Tip 1: read in only a limited number of rows
+The simplest thing (which you will already be familiar with from SQL) is to read in only a limited number of rows of your data.
+
+*This will almost always be a good place to start*, because it allows you to inspect what your data looks like.
+
+You can do this using the `read_csv` function (from the `tidyverse`), which lets you limit the number of rows with the argument `n_max`:
+
+```{r, message=FALSE}
+limited_data <- read_csv("ira_tweets_csv_hashed.csv", n_max = 10)
+
+limited_data %>% 
+  colnames()
+```
+
+### Tip 2: faster reading of an entire data set with the 'vroom' package
+Say you're actually able to fit in the entire dataset (e.g., you will probably be able to fit in a 5 gig CSV), but it's just taking a bit too long. 
+In this case, just use `vroom` (https://www.tidyverse.org/blog/2019/05/vroom-1-0-0/) instead of the `read_csv` function.
+Vroom is much faster than read_csv, because it uses multi-threading plus 'lazy' data reading.
+
+For a 5.43 gigabyte CSV (a large dataset of tweets), `read_csv` took about *two minutes* --- but `vroom` took only *about 10 seconds*!
+
+```{r}
+all_data <- read_csv("ira_tweets_csv_hashed.csv") #about 2 minutes on my 2018 macbook pro
+all_data <- vroom("ira_tweets_csv_hashed.csv") #about 10 seconds
+```
+
+
+### Tip 3: read in only selected columns
+Say that, having inspected 10 rows of my data set of tweets (with `read_csv("my_tweet_data.csv", n_max = 10)`), I am only interested in the columns 'tweetid', 'user_display_name', 'tweet_text', and 'tweet_time'.
+
+In this case, don't bother reading in all the columns in the first place!
+Use the `col_select` argument to vroom to select only specific columns to read:
+
+```{r}
+partial_data <- vroom("ira_tweets_csv_hashed.csv", col_select = c(tweetid, user_display_name, tweet_text, tweet_time))
+
+partial_data
+```
+
+## Out-of-memory strategies
+I don't have experience with this myself, but it seems the best place to start is Apache Spark, for which there is an R package called `sparklyr` that allows you to work with the tools within R that you're already familiar with.
+
+Watch this RStudio webinar to get started: [Sparklyr: Using Spark with RMarkdown | RStudio Webinar - 2016](https://www.youtube.com/watch?v=GtVwHNxXVgQ)
+
+
