@@ -69,8 +69,9 @@ partial_data
 ```
 
 ## Out-of-memory strategies
-I don't have experience with this myself, but it seems the best place to start is Apache Spark, for which there is an R package called `sparklyr` that allows you to work with the tools within R that you're already familiar with.
+I don't have experience with this myself, but watch this RStudio seminar to get started, which will outline the different options available: [Working with big data in R](https://rstudio.com/resources/webinars/working-with-big-data-in-r/)
 
-Watch this RStudio webinar to get started: [Sparklyr: Using Spark with RMarkdown | RStudio Webinar - 2016](https://www.youtube.com/watch?v=GtVwHNxXVgQ)
+One of the most use tools is Apache Spark, for which there is an R package called `sparklyr` that allows you to work with the tools within R that you're already familiar with: [Sparklyr: Using Spark with RMarkdown | RStudio Webinar - 2016](https://www.youtube.com/watch?v=GtVwHNxXVgQ)
+
 
 
